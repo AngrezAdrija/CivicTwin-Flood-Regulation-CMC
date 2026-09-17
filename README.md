@@ -1,4 +1,4 @@
-# CivicTwin: Flood Regulation Platform for CMC Zone
+# CivicTwin: AI-Enabled Digital Twin for Predictive Urban Infrastructure Resilience
 
 A React & Leaflet spatial digital twin platform for real-time urban drainage monitoring, storm simulation, and dynamic flood risk assessment.
 

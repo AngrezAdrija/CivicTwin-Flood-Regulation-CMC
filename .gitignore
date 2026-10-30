@@ -1,0 +1,14 @@
+# Python / Virtual Environment
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node / Web Frontend
+node_modules/
+dist/
+.env
+
+# Temporary files
+*.tmp
+*.log

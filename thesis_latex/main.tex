@@ -1,0 +1,151 @@
+\documentclass[12pt,a4paper]{report}
+
+% -----------------------------------------------------------------------------
+% VIT Dissertation Formatting Specifications
+% Left Margin: 1.5 inch, Right: 1.0 inch, Top: 1.0 inch, Bottom: 1.0 inch
+% Font: Times New Roman 12pt, Line Spacing: 1.5
+% -----------------------------------------------------------------------------
+\usepackage[left=1.5in, right=1.0in, top=1.0in, bottom=1.0in]{geometry}
+\usepackage{mathptmx} % Times New Roman font
+\usepackage{setspace}
+\onehalfspacing
+
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{emerald}{RGB}{16, 185, 129}
+\definecolor{slate}{RGB}{100, 116, 139}
+\usepackage{titlesec}
+\usepackage{caption}
+
+% Caption styling: 10pt, Title Case, bold labels
+\DeclareCaptionFont{tenpt}{\fontsize{10pt}{12pt}\selectfont}
+\captionsetup{font=tenpt, labelfont=bf, justification=centering}
+\captionsetup[figure]{name=Fig.}
+\captionsetup[table]{name=Table}
+
+% Chapter heading formatting: 14pt, BOLD, CAPS
+\titleformat{\chapter}[display]
+  {\normalfont\fontsize{14pt}{18pt}\bfseries\centering}
+  {\chaptertitlename\ \thechapter}
+  {10pt}
+  {\fontsize{14pt}{18pt}\bfseries\MakeUppercase}
+
+\titlespacing*{\chapter}{0pt}{-20pt}{25pt}
+
+% Section headings: 12pt, BOLD
+\titleformat{\section}
+  {\normalfont\fontsize{12pt}{15pt}\bfseries}
+  {\thesection}
+  {1em}
+  {}
+
+\titleformat{\subsection}
+  {\normalfont\fontsize{12pt}{15pt}\bfseries}
+  {\thesubsection}
+  {1em}
+  {}
+
+% Listings configuration for code snippets
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue}\bfseries,
+  commentstyle=\color{green!50!black}\itshape,
+  stringstyle=\color{red!70!black},
+  showstringspaces=false,
+  tabsize=2
+}
+
+% Hyperlink configuration
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  colorlinks=false,
+  pdfborder={0 0 0},
+  pdftitle={CivicTwin: AI-Enabled Digital Twin for Predictive Urban Infrastructure Resilience},
+  pdfauthor={Adrija Biswas (25MCA0212)}
+}
+
+\begin{document}
+
+% -----------------------------------------------------------------------------
+% FRONT MATTER (Roman Page Numbering)
+% -----------------------------------------------------------------------------
+\pagenumbering{roman}
+\pagestyle{plain}
+
+% Cover Page (Page i - number hidden per VIT guidelines)
+\input{frontmatter/titlepage}
+
+% Inner Title Page (Page ii - visible)
+\input{frontmatter/inner_titlepage}
+
+% Declaration (Page iii) and Certificate (Page iv)
+\input{frontmatter/declaration}
+\input{frontmatter/certificate}
+
+% Acknowledgement (Page v)
+\input{frontmatter/acknowledgement}
+
+% Executive Summary (Page vi)
+\input{frontmatter/executive_summary}
+
+% Table of Contents, Figures, Tables
+\tableofcontents
+\clearpage
+
+\listoffigures
+\clearpage
+
+\listoftables
+\clearpage
+
+% Abbreviations and Notations
+\input{frontmatter/abbreviations}
+\input{frontmatter/notations}
+
+% -----------------------------------------------------------------------------
+% MAIN DISSERTATION CHAPTERS (Arabic Page Numbering: 1, 2, 3...)
+% -----------------------------------------------------------------------------
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/chapter1_introduction}
+\input{chapters/chapter2_literature_review}
+\input{chapters/chapter3_technical_specification}
+\input{chapters/chapter4_hydrodynamic_graph_engine}
+\input{chapters/chapter5_predictive_modeling}
+\input{chapters/chapter6_dispatch_optimization}
+\input{chapters/chapter7_results_and_discussion}
+\input{chapters/chapter8_demonstration}
+\input{chapters/chapter9_summary_and_conclusion}
+
+% -----------------------------------------------------------------------------
+% REFERENCES
+% -----------------------------------------------------------------------------
+\clearpage
+\singlespacing
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\onehalfspacing
+
+% -----------------------------------------------------------------------------
+% APPENDICES (No page numbers per VIT guidelines)
+% -----------------------------------------------------------------------------
+\clearpage
+\pagestyle{empty}
+
+\input{appendices/appendix_a_ui_screens}
+\input{appendices/appendix_b_algorithms}
+\input{appendices/appendix_c_database_schema}
+
+\end{document}

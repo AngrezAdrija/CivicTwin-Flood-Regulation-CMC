@@ -1,0 +1,36 @@
+{
+  "finished": "2026-10-12 14:48:40",
+  "runtime_seconds": 28.2,
+  "settings": {
+    "rain": [
+      80,
+      120,
+      160
+    ],
+    "k": 500,
+    "every": 10,
+    "seeds": 20,
+    "quick": false
+  },
+  "drains": 13998,
+  "drains_rankable": 13961,
+  "graph_mode": "geometry_connectivity",
+  "join_mode": "vertices",
+  "graph_stats": {
+    "edges": 22737,
+    "components": 58,
+    "isolated_drains": 53,
+    "cascade_median": 27.0,
+    "cascade_p95": 946.0,
+    "cascade_max": 1518
+  },
+  "ward_source": "spatial clusters (k-means zones, not official wards)",
+  "area_source": "inverted from peak_runoff_m3s (rational method)",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26300-SP0",
+  "packages": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "networkx": "3.6.1"
+  }
+}

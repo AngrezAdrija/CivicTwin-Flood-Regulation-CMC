@@ -1,0 +1,92 @@
+\chapter{LITERATURE REVIEW}
+
+\section{Urban Stormwater Infrastructure and Hydraulic Modeling}
+Urban stormwater drainage design has historically relied on empirical and numerical physics-based hydrodynamic formulations. The foundational formulation for surface runoff estimation remains the rational method, popularized by Kuichling and formalized by Chow et al. \cite{chow1988applied}:
+\begin{equation}
+Q = \frac{C \cdot i \cdot A}{3.6 \times 10^6}
+\label{eqn:rational_foundational}
+\end{equation}
+where $Q$ denotes peak discharge in $\text{m}^3/\text{s}$, $C$ represents the dimensionless runoff coefficient, $i$ is rainfall intensity in $\text{mm}/\text{hr}$, and $A$ is the catchment surface area in $\text{m}^2$. The rational method assumes that peak runoff occurs when the entire tributary area contributes flow simultaneously, corresponding to a rainfall event whose duration equals or exceeds the time of concentration of the basin \cite{butler2018urban}.
+
+To model in-channel conduit hydraulics, classic civil engineering relies on the Manning equation for open-channel gravity flow:
+\begin{equation}
+V = \frac{1}{n} R_h^{2/3} S_0^{1/2}
+\label{eqn:manning_formula}
+\end{equation}
+where $V$ is the cross-sectional mean velocity ($\text{m}/\text{s}$), $n$ is Manning's roughness coefficient (typically 0.013--0.017 for concrete and smooth masonry, and 0.025--0.035 for unlined or silted earthen channels), $R_h$ is the hydraulic radius ($A_c / P_w$, the cross-sectional flow area divided by the wetted perimeter), and $S_0$ is the hydraulic bed slope.
+
+Computational modeling packages such as the United States Environmental Protection Agency Storm Water Management Model (US-EPA SWMM) \cite{rossman2015storm} solve the one-dimensional Saint-Venant equations for unsteady open-channel flow:
+\begin{align}
+\frac{\partial A_c}{\partial t} + \frac{\partial Q}{\partial x} &= 0 \quad \text{(Continuity)} \\
+\frac{\partial Q}{\partial t} + \frac{\partial}{\partial x}\left(\frac{Q^2}{A_c}\right) + g A_c \frac{\partial H}{\partial x} + g A_c S_f &= 0 \quad \text{(Momentum)}
+\end{align}
+While SWMM provides high hydraulic fidelity, simulating dynamic wave routing across municipal networks containing tens of thousands of links requires substantial computational overhead. Execution times can range from several minutes to hours, requiring fine-grained cross-sectional surveys, junction invert levels, and headloss coefficient calibration \cite{rossman2015storm}. Consequently, physics-based numerical packages are ideally suited for offline master-plan infrastructure sizing, but are ill-suited for real-time operational emergency dispatch where municipal decision-makers must evaluate alternative maintenance actions within seconds during imminent cloudburst threats.
+
+\section{Digital Twins in Civil and Municipal Engineering}
+The paradigm of the Digital Twin (DT), originally conceived in aerospace and advanced manufacturing by Grieves and Vickers, has rapidly expanded into civil infrastructure and smart city operations \cite{batty2018digital, tao2019digital}. A digital twin constitutes a dynamic virtual counterpart of a physical asset or municipal system that maintains continuous bi-directional synchronization through data ingestion, computational analytics, and actionable operational feedback.
+
+Fuller et al. \cite{fuller2020digital} categorize digital twins across three distinct evolutionary tiers:
+\begin{enumerate}
+    \item \textbf{Digital Models:} Static digital representations with manual data flow in both directions (e.g., standard CAD/BIM repositories and static GIS maps).
+    \item \textbf{Digital Shadows:} Systems wherein data flows automatically from the physical asset to the digital model via sensing devices or automated field surveys, but operational interventions remain manual.
+    \item \textbf{Digital Twins:} Closed-loop cyber-physical systems wherein real-time sensory or survey data updates the computational twin, and the twin generates predictive interventions that directly drive physical actions (e.g., automated control or prioritized field work orders).
+\end{enumerate}
+
+In the water sector, digital twins have been predominantly deployed in pressurized drinking water distribution networks to detect pipe bursts and optimize pumping schedules. However, adapting the digital twin framework to gravity-driven urban stormwater drainage systems poses unique obstacles: networks are largely unpressurized, open to municipal solid waste infiltration, and lack pervasive subterranean sensor instrumentation. CivicTwin addresses this paradigm by establishing a digital twin of the Vellore stormwater system that couples geospatial network models, surveyed sediment states, and dynamic storm simulations to guide physical municipal desilting operations.
+
+\section{Machine Learning and Surrogate Modeling in Flood Risk Assessment}
+Given the prohibitive computational runtime of numerical 1D/2D hydrodynamic models, researchers have turned to Machine Learning (ML) surrogate models to achieve rapid flood risk estimation \cite{bermudez2018rapid, bomers2019surrogate}. Surrogate models approximate the input-output behavior of complex hydrodynamic simulations or empirical failure records using data-driven statistical learners.
+
+Kabir et al. \cite{kabir2020deep} demonstrated that deep neural architectures and ensemble decision trees can predict urban inundation extents orders of magnitude faster than full 2D shallow water solvers while preserving adequate accuracy. Berm{\'u}dez et al. \cite{bermudez2018rapid} utilized support vector machines and random forests trained on pre-calculated hydraulic simulations to forecast localized water depths across river reaches in real time.
+
+Among classical machine learning classifiers, the Random Forest (RF) algorithm proposed by Breiman \cite{breiman2001random} possesses attributes that make it exceptionally well suited for municipal drainage assessment:
+\begin{itemize}
+    \item It builds an ensemble of decorrelated decision trees using bootstrap aggregating (bagging) and random feature selection, mitigating overfitting on tabular municipal engineering datasets.
+    \item It effectively handles non-linear relationships, multi-collinearity, and heterogeneous continuous/categorical feature spaces (e.g., conduit dimensions, elevation, slope, and structural materials).
+    \item It provides native Gini impurity and permutation feature importance metrics, granting transparency and explainability to municipal engineers.
+\end{itemize}
+In CivicTwin, a Random Forest classifier serves as a surrogate vulnerability estimator, predicting structural conduit blockage and surcharge susceptibility from physical terrain and structural attributes.
+
+\section{Complex Network Theory and Cascading Failures in Urban Utilities}
+Stormwater drainage conduits do not function in isolation; they form complex interconnected directed networks governed by gravitational topography. Complex network analysis provides powerful mathematical tools for modeling structural vulnerability and cascading failure across networked infrastructure \cite{newman2018networks, yazdani2012complex}.
+
+Motter and Lai \cite{motter2002cascade} established that in capacity-constrained complex networks, the failure of a single critical hub can trigger a load redistribution cascade that collapses the entire network. In urban drainage networks, cascading failure manifests as hydraulic backwater surcharge: when a downstream trunk conduit suffers capacity exhaustion (due to silt deposition or severe rainfall inflow), it can no longer evacuate tributary water. The resulting hydraulic head builds up upstream, producing backwater stagnation, submerging upstream junction inverts, and causing surface overflows in channels situated kilometers away from the physical bottleneck \cite{yazdani2012complex}.
+
+Graph-theoretic modeling of drainage systems requires formulating the network as a Directed Acyclic Graph (DAG) $G = (V, E)$, where vertices $V$ denote conduit segments and directed edges $E$ denote downhill hydraulic flow links \cite{diestel2017graph}. Traditional graph traversal algorithms, such as Tarjan's depth-first search (DFS) \cite{tarjan1972depth}, permit the extraction of topological order and reachability trees. However, computing the complete all-pairs reachability matrix across a large municipal graph with $|V| \approx 14,000$ using standard recursive DFS exhibits a computational complexity of $\mathcal{O}(|V| \cdot (|V| + |E|))$, which requires millions of operations. To overcome this latency for real-time dispatch, CivicTwin implements bitset-parallelized ancestor reachability over the topological sort, compressing transitive closure computations to milliseconds.
+
+\section{Critical Analysis and Research Gaps}
+Table~\ref{tab:lit_comparison} synthesizes existing urban stormwater management approaches against the capabilities introduced in CivicTwin.
+
+\begin{table}[h!]
+\centering
+\caption{Comparative Analysis of Urban Drainage Management Paradigms}
+\label{tab:lit_comparison}
+\fontsize{9pt}{11pt}\selectfont
+\begin{tabular}{|p{3.2cm}|p{2.6cm}|p{2.6cm}|p{2.8cm}|p{3.2cm}|}
+\hline
+\textbf{Dimension} & \textbf{EPA-SWMM} \cite{rossman2015storm} & \textbf{GIS Static Mapping} & \textbf{ML Flood Surrogates} \cite{kabir2020deep} & \textbf{CivicTwin (Proposed)} \\
+\hline
+\textbf{Underlying Model} & Dynamic 1D/2D Saint-Venant & Static vector GIS layers & Black-box Neural Nets / Ensemble trees & Rational hydrology + Topological DAG \\
+\hline
+\textbf{Execution Latency} & Minutes to hours & Static (No simulation) & Sub-second & Real-time ($< 30$~ms) \\
+\hline
+\textbf{Network Topology} & Hydraulic links \& nodes & Spatial lines without flow direction & Often non-topological (pixel grid) & Directed Acyclic Graph (22,737 edges) \\
+\hline
+\textbf{Cascading Reachability} & Implicitly simulated via pressure head & Absent & Absent & Explicit bitset ancestor closure ($C_{\text{saved}}$) \\
+\hline
+\textbf{Decision Support} & Offline engineering analysis & Query and visualization & Flood depth heatmaps & Automated multi-criteria dispatch ranking \\
+\hline
+\textbf{Work Order Lifecycle} & None & None & None & Closed-loop Dispatch $\rightarrow$ Cleared queue \\
+\hline
+\end{tabular}
+\end{table}
+
+The literature review reveals three distinct research gaps in current urban engineering systems:
+\begin{enumerate}
+    \item \textbf{Disconnection between Hydraulic Surrogates and Dispatch Optimization:} While prior works have applied machine learning to predict flood extent, virtually none translate these predictions into actionable, multi-criteria municipal desilting schedules under constrained maintenance budgets.
+    \item \textbf{Neglect of Upstream Reachability in Prioritization:} Traditional municipal maintenance heuristics prioritize isolated blockage percentage (severity-only), ignoring whether an excavation relieves 2 upstream conduits or 1,200 upstream conduits.
+    \item \textbf{Lack of Integrated Cyber-Physical Spatial Platforms:} Existing municipal tools either consist of complex hydraulic simulation software inaccessible to field supervisors or simplistic complaint-ticketing portals devoid of any hydrodynamic intelligence.
+\end{enumerate}
+
+CivicTwin bridges these gaps by coupling topological bitset reachability, rational hydrology, and machine learning surrogates within an intuitive, real-time spatial web application.
+

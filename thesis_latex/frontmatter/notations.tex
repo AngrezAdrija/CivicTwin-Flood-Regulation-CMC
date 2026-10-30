@@ -1,0 +1,36 @@
+\thispagestyle{plain}
+\begin{center}
+    {\fontsize{14pt}{18pt}\selectfont \textbf{SYMBOLS AND NOTATIONS}\par}
+\end{center}
+\vspace{0.8cm}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\textbf{Symbol} & \textbf{Description} & \textbf{Unit} \\
+\hline
+$Q$ & Peak stormwater runoff discharge rate & $\text{m}^3/\text{s}$ \\
+$C$ & Catchment surface runoff coefficient & Dimensionless \\
+$i$ & Rainfall storm precipitation intensity & $\text{mm}/\text{hr}$ \\
+$A$ & Tributary catchment contributing area & $\text{m}^2$ \\
+$Q_{\text{design}}$ & Unobstructed design conveyance capacity & $\text{m}^3/\text{s}$ \\
+$S$ & Silt and solid waste sediment blockage & $\%$ \\
+$Q_{\text{avail}}$ & Effective hydraulic capacity post-silt reduction & $\text{m}^3/\text{s}$ \\
+$U$ & Hydraulic capacity utilisation ratio ($Q / Q_{\text{avail}}$) & Dimensionless \\
+$G = (V, E)$ & Directed Acyclic Graph of drainage network & --- \\
+$V$ & Vertex set of drainage conduit segments ($n = 13,998$) & --- \\
+$E$ & Directed edge set of downhill gravity flow links ($m = 22,737$) & --- \\
+$\text{pred}(v)$ & Immediate upstream hydraulic predecessors of node $v$ & --- \\
+$\text{succ}(v)$ & Immediate downstream hydraulic successors of node $v$ & --- \\
+$\text{anc}(v)$ & Set of all transitive upstream ancestor conduits of node $v$ & --- \\
+$\text{desc}(v)$ & Set of all transitive downstream descendant conduits of node $v$ & --- \\
+$C_{\text{saved}}(v)$ & Cascade reachability relief count ($|\text{anc}(v)|$) & Conduits \\
+$E_{\text{net}}$ & Systemic network risk exposure summation & $\%$ \\
+$T(v)$ & Categorical threat tier ($0 = \text{Low}, 1 = \text{High}, 2 = \text{Critical}$) & Discrete \\
+$K$ & Municipal maintenance clearing budget & Conduits \\
+$z$ & Terrain invert elevation above MSL & $\text{m}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\clearpage

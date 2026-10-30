@@ -1,0 +1,72 @@
+\chapter*{APPENDIX C: DATABASE DDL AND API SPECIFICATIONS}
+\addcontentsline{toc}{chapter}{APPENDIX C: DATABASE DDL AND API SPECIFICATIONS}
+
+\section*{C.1 Complete PostgreSQL / PostGIS Spatial Database DDL}
+\begin{lstlisting}[language=SQL]
+-- PostgreSQL 15 + PostGIS 3.3 Spatial Conduit Schema
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+CREATE TABLE IF NOT EXISTS drain_conduits (
+    drain_id VARCHAR(64) PRIMARY KEY,
+    ward_number INTEGER NOT NULL,
+    drain_type VARCHAR(32) NOT NULL DEFAULT 'Open Concrete',
+    width_m NUMERIC(5, 2) NOT NULL DEFAULT 1.50,
+    depth_m NUMERIC(5, 2) NOT NULL DEFAULT 1.20,
+    elevation_m NUMERIC(6, 2) NOT NULL,
+    slope_pct NUMERIC(5, 2) NOT NULL DEFAULT 0.50,
+    topographic_wetness_index NUMERIC(5, 2) DEFAULT 8.00,
+    design_capacity_m3s NUMERIC(6, 3) NOT NULL DEFAULT 1.000,
+    runoff_coefficient NUMERIC(4, 2) NOT NULL DEFAULT 0.70,
+    blockage_ratio NUMERIC(4, 3) NOT NULL DEFAULT 0.000,
+    start_node_id BIGINT,
+    end_node_id BIGINT,
+    geom GEOMETRY(LineString, 4326) NOT NULL
+);
+
+-- Fast Spatial Indexing for Viewport Queries
+CREATE INDEX IF NOT EXISTS idx_drain_conduits_geom 
+    ON drain_conduits USING GIST (geom);
+
+-- Attribute Indexes for Zone-Based Filtering
+CREATE INDEX IF NOT EXISTS idx_drain_conduits_ward 
+    ON drain_conduits (ward_number);
+\end{lstlisting}
+
+\section*{C.2 Core FastAPI Analytical Engine Endpoint Schemas}
+\begin{lstlisting}[language=Python]
+from pydantic import BaseModel
+from typing import List, Optional
+
+class DrainItemResponse(BaseModel):
+    segment_id: str
+    rank: Optional[int]
+    ward_number: int
+    drain_type: str
+    silt_pct: float
+    util_pct: int
+    threat: int
+    cascade_saved: int
+    status: str
+    path: List[List[float]]
+    center: Optional[List[float]]
+    has_geometry: bool
+
+class SimulationKPIs(BaseModel):
+    blocked_ge_50: int
+    over_capacity: int
+    critical: int
+    open: int
+    in_progress: int
+    cleared: int
+
+class TopDrainsResponse(BaseModel):
+    items: List[DrainItemResponse]
+    queue: List[DrainItemResponse]
+    remaining_open: int
+    kpis: SimulationKPIs
+    network_risk: float
+    rainfall_mmhr: float
+    ward: Optional[int]
+    strategy: str
+    run_id: str
+\end{lstlisting}

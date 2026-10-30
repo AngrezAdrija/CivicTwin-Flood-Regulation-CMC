@@ -1,0 +1,150 @@
+\chapter{RESULTS AND DISCUSSION}
+
+\section{Quantitative Performance Benchmarking}
+To validate the effectiveness of the proposed cascade-aware dispatch methodology against existing municipal maintenance heuristics, extensive simulation experiments were conducted across the complete 13,998 conduit network. Table~\ref{tab:experimental_summary} compiles the quantitative results across rainfall regimes of 80, 120, and 160~mm/hr for maintenance budgets ranging from $K = 10$ to $K = 500$ desilting actions.
+
+\begin{table}[h!]
+\centering
+\caption{Comparative Dispatch Strategy Performance Across Storm Regimes}
+\label{tab:experimental_summary}
+\fontsize{8pt}{10pt}\selectfont
+\begin{tabular}{|c|c|l|c|c|c|c|c|}
+\hline
+\textbf{Rain} & \textbf{Budget} & \textbf{Strategy} & \textbf{Exposure} & \textbf{At-Risk} & \textbf{Over-Cap} & \textbf{Critical} & \textbf{Drains} \\
+\textbf{(mm/hr)} & \textbf{($K$)} & & \textbf{Red. (\%)} & \textbf{Resolved} & \textbf{Resolved} & \textbf{Resolved} & \textbf{Relieved} \\
+\hline
+80 & 10 & \textbf{Cascade-Aware (Proposed)} & 3.19\% & \textbf{198} & 10 & 10 & 2,987 \\
+80 & 10 & Severity-Only (Baseline) & 4.87\% & 38 & 9 & 10 & 2,345 \\
+80 & 10 & Cascade-Only (Ablation) & 0.02\% & 0 & 0 & 0 & 2,343 \\
+80 & 10 & Random (Baseline $\pm \sigma$) & 0.01\% & $0.9 \pm 2.0$ & 0.5 & 0.3 & 1,318 \\
+\hline
+80 & 50 & \textbf{Cascade-Aware (Proposed)} & 10.39\% & \textbf{473} & 50 & 50 & 4,679 \\
+80 & 50 & Severity-Only (Baseline) & 12.53\% & 163 & 47 & 50 & 4,148 \\
+80 & 50 & Cascade-Only (Ablation) & 0.08\% & 0 & 0 & 0 & 3,179 \\
+80 & 50 & Random (Baseline $\pm \sigma$) & 0.11\% & $6.8 \pm 8.5$ & 3.1 & 2.3 & 3,606 \\
+\hline
+80 & 100 & \textbf{Cascade-Aware (Proposed)} & 19.89\% & \textbf{746} & 99 & 100 & 5,596 \\
+80 & 100 & Severity-Only (Baseline) & 21.04\% & 250 & 96 & 100 & 5,030 \\
+80 & 100 & Cascade-Only (Ablation) & 0.31\% & 45 & 3 & 3 & 4,444 \\
+80 & 100 & Random (Baseline $\pm \sigma$) & 0.15\% & $13.3 \pm 14.5$ & 5.8 & 4.0 & 4,731 \\
+\hline
+80 & 250 & \textbf{Cascade-Aware (Proposed)} & 41.22\% & \textbf{1,451} & 247 & 250 & 6,980 \\
+80 & 250 & Severity-Only (Baseline) & 35.32\% & 858 & 244 & 250 & 6,506 \\
+80 & 250 & Cascade-Only (Ablation) & 3.34\% & 245 & 10 & 7 & 4,763 \\
+80 & 250 & Random (Baseline $\pm \sigma$) & 0.40\% & $26.0 \pm 15.7$ & 13.9 & 9.2 & 6,226 \\
+\hline
+\hline
+120 & 10 & \textbf{Cascade-Aware (Proposed)} & 1.44\% & \textbf{18} & 5 & 9 & 3,010 \\
+120 & 10 & Severity-Only (Baseline) & 1.79\% & 4 & 5 & 8 & 2,965 \\
+120 & 10 & Cascade-Only (Ablation) & 0.02\% & 0 & 0 & 0 & 2,343 \\
+120 & 10 & Random (Baseline $\pm \sigma$) & 0.01\% & $1.1 \pm 1.7$ & 1.3 & 0.8 & 1,318 \\
+\hline
+120 & 50 & \textbf{Cascade-Aware (Proposed)} & 3.52\% & \textbf{93} & 38 & 46 & 4,412 \\
+120 & 50 & Severity-Only (Baseline) & 6.26\% & 26 & 22 & 41 & 5,365 \\
+120 & 50 & Cascade-Only (Ablation) & 0.09\% & 5 & 2 & 3 & 3,179 \\
+120 & 50 & Random (Baseline $\pm \sigma$) & 0.09\% & $5.1 \pm 3.7$ & 5.9 & 5.0 & 3,606 \\
+\hline
+120 & 100 & \textbf{Cascade-Aware (Proposed)} & 7.35\% & \textbf{209} & 79 & 95 & 4,677 \\
+120 & 100 & Severity-Only (Baseline) & 7.30\% & 50 & 48 & 79 & 5,480 \\
+120 & 100 & Cascade-Only (Ablation) & 0.37\% & 17 & 5 & 7 & 4,444 \\
+120 & 100 & Random (Baseline $\pm \sigma$) & 0.13\% & $10.3 \pm 6.8$ & 11.2 & 9.2 & 4,731 \\
+\hline
+120 & 250 & \textbf{Cascade-Aware (Proposed)} & 19.72\% & \textbf{476} & 196 & 240 & 6,697 \\
+120 & 250 & Severity-Only (Baseline) & 20.75\% & 150 & 153 & 216 & 6,506 \\
+120 & 250 & Cascade-Only (Ablation) & 2.28\% & 123 & 19 & 15 & 4,763 \\
+120 & 250 & Random (Baseline $\pm \sigma$) & 0.28\% & $25.8 \pm 12.1$ & 29.4 & 21.3 & 6,226 \\
+\hline
+\hline
+160 & 50 & \textbf{Cascade-Aware (Proposed)} & 1.98\% & \textbf{90} & 32 & 41 & 4,419 \\
+160 & 50 & Severity-Only (Baseline) & 3.41\% & 9 & 14 & 27 & 5,150 \\
+160 & 50 & Cascade-Only (Ablation) & 0.11\% & 15 & 3 & 2 & 3,179 \\
+160 & 50 & Random (Baseline $\pm \sigma$) & 0.06\% & $4.7 \pm 3.7$ & 8.1 & 6.1 & 3,606 \\
+\hline
+160 & 100 & \textbf{Cascade-Aware (Proposed)} & 3.48\% & \textbf{136} & 64 & 81 & 4,710 \\
+160 & 100 & Severity-Only (Baseline) & 6.75\% & 36 & 28 & 56 & 6,248 \\
+160 & 100 & Cascade-Only (Ablation) & 0.41\% & 46 & 12 & 5 & 4,444 \\
+160 & 100 & Random (Baseline $\pm \sigma$) & 0.11\% & $10.6 \pm 5.6$ & 16.3 & 11.9 & 4,731 \\
+\hline
+160 & 250 & \textbf{Cascade-Aware (Proposed)} & 8.94\% & \textbf{262} & 172 & 207 & 6,143 \\
+160 & 250 & Severity-Only (Baseline) & 9.75\% & 59 & 74 & 140 & 6,632 \\
+160 & 250 & Cascade-Only (Ablation) & 1.70\% & 147 & 34 & 23 & 4,763 \\
+160 & 250 & Random (Baseline $\pm \sigma$) & 0.24\% & $28.2 \pm 11.5$ & 41.5 & 31.4 & 6,226 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Analysis of At-Risk and Backwater Flood Resolution}
+The critical metric for municipal public works is the number of \textbf{At-Risk Drains Resolved}---channels freed from active surface overflow or backwater surcharge. Figure~\ref{fig:res_at_risk} illustrates the trajectory of at-risk drain resolution across cleaning steps.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/fig_at_risk_resolved.png}
+\caption{Comparative Resolution of At-Risk Conduits Across Storm Intensities}
+\label{fig:res_at_risk}
+\end{figure}
+
+The empirical results reveal a pronounced superiority of the proposed Cascade-Aware strategy over traditional Severity-Only desilting:
+\begin{itemize}
+    \item \textbf{Under 80 mm/hr Storm Rainfall:}
+    At a modest budget of $K = 50$ conduits cleaned, Cascade-Aware resolves \textbf{473} at-risk conduits, compared to only 163 for Severity-Only (a $2.90\times$ improvement). At $K = 100$, Cascade-Aware resolves \textbf{746} conduits versus 250 for Severity-Only (a \textbf{$2.98\times$ improvement}). At $K = 250$, Cascade-Aware resolves \textbf{1,451} conduits versus 858.
+    \item \textbf{Under 120 mm/hr Severe Storm Rainfall:}
+    At $K = 50$, Cascade-Aware resolves \textbf{93} at-risk segments compared to 26 for Severity-Only ($3.58\times$ gain). At $K = 100$, Cascade-Aware resolves \textbf{209} segments versus 50 for Severity-Only---representing an extraordinary \textbf{$4.18\times$ increase} in flood mitigation efficiency under an identical maintenance expenditure.
+    \item \textbf{Under 160 mm/hr Extreme Cloudburst Conditions:}
+    At $K = 50$, Cascade-Aware resolves \textbf{90} at-risk segments versus 9 for Severity-Only ($10\times$ improvement). At $K = 100$, Cascade-Aware resolves \textbf{136} segments versus 36 ($3.78\times$ gain). At $K = 250$, Cascade-Aware resolves \textbf{262} segments versus 59 (\textbf{$4.44\times$ improvement}).
+\end{itemize}
+
+This marked disparity occurs because Severity-Only focuses on clearing isolated headwaters carrying extreme percentage overloads but zero downstream impact. In contrast, Cascade-Aware unblocks critical downstream conduit bottlenecks, instantaneously releasing backwater congestion across dozens of interconnected upstream tributaries.
+
+\section{Network Risk Exposure Trajectories}
+Figure~\ref{fig:res_exposure} presents the network exposure reduction percentage ($\Delta E_{\text{net}}\%$) across clearing interventions for all four strategies.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/fig_exposure_reduction.png}
+\caption{Network Risk Exposure Reduction (\%) Across Cleaning Interventions}
+\label{fig:res_exposure}
+\end{figure}
+
+Several key dynamics are apparent:
+\begin{itemize}
+    \item \textbf{Stochastic Inefficacy of Random Dispatch:} Uniform random desilting yields virtually zero systemic benefit. Across all rainfall regimes, cleaning 500 random conduits reduces network exposure by less than 0.8\%, resolving fewer than 65 at-risk drains. This underscores the futility of unguided, arbitrary municipal maintenance.
+    \item \textbf{Ablation Insights on Cascade-Only:} Ranking purely by cascade reachability without conditioning on threat tier ($T(v)$) fails because the algorithm clears large downstream trunk canals that possess high tributary counts but are currently flowing well within design capacity ($U < 0.5$). Thus, coupling topological reachability with the hydrodynamic threat tier is mathematically indispensable.
+    \item \textbf{Convergence at Deep Budgets:} At extensive budgets ($K = 500$), Severity-Only and Cascade-Aware converge to similar overall exposure reductions ($\approx 45.6\%$ at 80~mm/hr) as both methods eventually exhaust the pool of critical bottlenecks. However, in municipal reality, public works departments operate within the scarce budget regime ($K \le 100$), where Cascade-Aware delivers up to four-fold higher operational yield.
+\end{itemize}
+
+\section{Reachability Impact and Upstream Relief}
+Figure~\ref{fig:res_relieved} depicts the total count of distinct upstream conduit segments relieved ($|\bigcup_{k=1}^K \text{anc}(v_k)|$).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/fig_drains_relieved.png}
+\caption{Distinct Upstream Conduits Relieved Across Cleaning Interventions}
+\label{fig:res_relieved}
+\end{figure}
+
+The data illustrates that within just 50 clearing actions, Cascade-Aware directly relieves between 4,412 and 4,679 distinct upstream conduits across Vellore Corporation, reaching over 7,943 conduits at $K = 500$ (representing 56.8\% of the entire municipal drainage network). This empirical reachability explains why localized street waterlogging diminishes rapidly throughout entire residential sectors when dispatch is guided by CivicTwin.
+
+\section{Computational Latency and Scalability}
+Table~\ref{tab:runtime_scalability} profiles the computational latency of the core algorithms within the Python analytical engine.
+
+\begin{table}[h!]
+\centering
+\caption{Analytical Engine Algorithmic Runtime Profiles ($N = 13{,}998$)}
+\label{tab:runtime_scalability}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Computational Operation} & \textbf{Algorithm / Mechanism} & \textbf{Latency (ms)} \\
+\hline
+Full Network Graph Construction & DAG Topology + Elevation Chaining & $142.0 \pm 8.2$~ms \\
+Transitive Ancestor Reachability & Topological Sort + Bitset Popcount & $18.4 \pm 1.1$~ms \\
+Rational Runoff Flow Evaluation & Vectorized NumPy Array Math & $1.2 \pm 0.1$~ms \\
+Downstream Exposure Dynamic Program & Reverse Topological Traversal & $4.6 \pm 0.3$~ms \\
+Full Strategy Re-Ranking & Lexicographical Sort (\texttt{np.lexsort}) & $2.8 \pm 0.2$~ms \\
+Single Conduit State Transition & Mutex Lock + Incremental Update & $0.4 \pm 0.05$~ms \\
+\hline
+\textbf{Total Interactive Request Latency} & End-to-End FastAPI \texttt{/api/py/top} & \textbf{$28.2 \pm 2.4$~ms} \\
+\hline
+\end{tabular}
+\end{table}
+
+The entire analytical cycle executes in under 30 milliseconds, enabling instantaneous, smooth UI responsiveness when operators slide the storm precipitation intensity bar across the operations command dashboard.

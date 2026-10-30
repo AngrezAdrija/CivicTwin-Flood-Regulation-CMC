@@ -1,0 +1,127 @@
+\chapter{HYDRODYNAMIC MODELING AND GRAPH CASCADE ENGINE}
+
+\section{Hydrological Formulation and Catchment Inversion}
+Urban stormwater accumulation across a municipality is driven by meteorological precipitation falling upon heterogeneous land surfaces. CivicTwin models peak runoff flow rate using the rational method. For each conduit segment $v \in V$, the expected peak surface runoff $Q(v)$ arriving at the conduit during a storm of intensity $i$ (in $\text{mm}/\text{hr}$) is governed by:
+\begin{equation}
+Q(v) = \frac{C(v) \cdot i \cdot A(v)}{3.6 \times 10^6} \quad [\text{m}^3/\text{s}]
+\label{eqn:rational_specific}
+\end{equation}
+where $C(v) \in [0.1, 0.95]$ represents the localized dimensionless runoff coefficient, $i$ is the uniform rainfall intensity parameter, and $A(v)$ is the tributary catchment surface area (in $\text{m}^2$) contributing drainage directly to conduit $v$. The constant divisor $3.6 \times 10^6$ reconciles unit conversions between millimeters, hours, square meters, and seconds:
+\begin{equation}
+1~\frac{\text{mm} \cdot \text{m}^2}{\text{hr}} = \frac{10^{-3}~\text{m} \cdot \text{m}^2}{3600~\text{s}} = \frac{1}{3.6 \times 10^6}~\frac{\text{m}^3}{\text{s}}
+\end{equation}
+
+In municipal survey datasets where baseline peak runoff $Q_0(v)$ and baseline rainfall intensity $i_0(v)$ are cataloged, the contributing tributary area $A(v)$ can be analytically inverted via:
+\begin{equation}
+A(v) = \text{clip}\left(\frac{Q_0(v) \cdot 3.6 \times 10^6}{C(v) \cdot i_0(v)}, A_{\min}, A_{\max}\right)
+\label{eqn:area_inversion}
+\end{equation}
+where $A_{\min} = 5{,}000~\text{m}^2$ and $A_{\max} = 50{,}000~\text{m}^2$ enforce physically plausible catchment boundaries for urban street segments, eliminating division-by-zero anomalies in survey records. For conduits lacking baseline runoff records, a standard urban tributary area of $20{,}000~\text{m}^2$ is adopted.
+
+\section{Effective Capacity and Utilisation Formulation}
+Every conduit $v$ is characterized by an unobstructed design conveyance capacity $Q_{\text{design}}(v)$ (in $\text{m}^3/\text{s}$), determined by cross-sectional geometry, bed slope, and roughness according to Manning's equation (Eqn.~\ref{eqn:manning_formula}). However, the accumulation of solid waste, silt, and urban sediment diminishes the effective cross-sectional flow area. Let $S(v) \in [0, 100]$ represent the percentage volumetric silt blockage. The effective available conveyance capacity $Q_{\text{avail}}(v)$ is formulated as:
+\begin{equation}
+Q_{\text{avail}}(v) = Q_{\text{design}}(v) \cdot \max\left(1.0 - \frac{S(v)}{100}, 0.05\right)
+\label{eqn:avail_capacity}
+\end{equation}
+where a lower floor of $0.05$ (5\% residual capacity) prevents mathematical singularity when a channel is completely blocked.
+
+The hydraulic capacity utilisation ratio $U(v, i)$ at rainfall intensity $i$ is defined as the ratio of incoming runoff to effective available conveyance capacity:
+\begin{equation}
+U(v, i) = \min\left(U_{\max}, \frac{Q(v, i)}{Q_{\text{avail}}(v)}\right)
+\label{eqn:utilisation_def}
+\end{equation}
+where $U_{\max} = 3.0$ (300\% capacity utilisation) caps extreme ratios for stable numerical aggregation and visual map styling. 
+
+Based on the calculated utilisation ratio, conduits are partitioned into three operational threat tiers:
+\begin{equation}
+T(v, i) = \begin{cases}
+0~(\text{Low}), & \text{if } U(v, i) \le 0.80 \quad (\text{flow within safe design parameters}) \\
+1~(\text{High}), & \text{if } 0.80 < U(v, i) \le 1.25 \quad (\text{near capacity; surcharge imminent}) \\
+2~(\text{Critical}), & \text{if } U(v, i) > 1.25 \quad (\text{capacity breached; surface flooding active})
+\end{cases}
+\label{eqn:threat_tier}
+\end{equation}
+
+\section{Directed Acyclic Graph (DAG) Construction}
+Urban stormwater flows strictly by gravity from higher topographic elevations toward lower discharge channels and water bodies. To model network interactions, CivicTwin constructs a Directed Acyclic Graph $G = (V, E)$, where vertices $V$ represent individual conduit segments ($|V| = 13{,}998$) and directed edges $E$ represent hydraulic connectivity ($|E| = 22{,}737$).
+
+Constructing this topological graph from raw geospatial lines requires resolving junction connectivity:
+\begin{enumerate}
+    \item \textbf{Vertex Coordinate Extraction:} OpenStreetMap (OSM) drain ways meet at shared node junctions. Every polyline vertex coordinate $(lat, lon)$ is rounded to six decimal places ($\approx 0.11$~meter geographic precision) to serve as a topological junction key.
+    \item \textbf{Elevation-Enforced Directionality:} Invert elevations $z(v)$ derived from the 30-meter SRTM DEM are assigned to all conduits. To guarantee the physical reality of downhill gravity flow and rigorously eliminate topological cycles, edges between conduits meeting at a shared junction are directed strictly from higher elevation to lower elevation:
+    \begin{equation}
+    (u, v) \in E \iff u \text{ and } v \text{ share a vertex, and } z(u) > z(v)
+    \end{equation}
+    Ties in elevation ($z(u) = z(v)$) are broken deterministically by internal segment index to ensure strict DAG properties.
+    \item \textbf{Junction Edge Reduction:} If $k$ conduits meet at a shared junction point, instead of inserting all $\mathcal{O}(k^2)$ pairwise combinations, the conduits are sorted in descending elevation order:
+    \begin{equation}
+    u_1 \succ u_2 \succ \dots \succ u_k
+    \end{equation}
+    Directed edges are created between adjacent pairs $(u_j, u_{j+1})$ for $j = 1, \dots, k-1$. This chains the junction with exactly $k-1$ edges while preserving identical upstream and downstream reachability sets, minimizing graph edge density.
+\end{enumerate}
+
+\begin{algorithm}[h!]
+\caption{Elevation-Enforced Drainage DAG Construction}
+\label{alg:dag_construction}
+\begin{algorithmic}[1]
+\REQUIRE Set of conduits $V$ with polylines $P(v)$ and elevations $z(v)$
+\ENSURE Directed Acyclic Graph $G = (V, E)$
+\STATE Initialize directed graph $G \leftarrow (V, \emptyset)$
+\STATE Initialize hash map $Junctions \leftarrow \emptyset$ \COMMENT{Map: vertex coordinate $\rightarrow$ list of conduit IDs}
+\FORALL{$v \in V$}
+    \FORALL{point $p \in P(v)$}
+        \STATE $key \leftarrow (\text{round}(p.lat, 6), \text{round}(p.lon, 6))$
+        \STATE Append $v$ to $Junctions[key]$
+    \ENDFOR
+\ENDFOR
+\STATE Sort conduits $V$ by elevation descending: $z(u) > z(v)$, breaking ties by segment ID
+\FORALL{$key, segs \in Junctions$}
+    \STATE Remove duplicate segments: $segs \leftarrow \text{unique}(segs)$
+    \IF{$|segs| \ge 2$}
+        \STATE Sort $segs$ according to descending elevation rank
+        \FOR{$j = 0$ \TO $|segs| - 2$}
+            \STATE Add directed edge $(segs[j], segs[j+1])$ to $G$
+        \ENDFOR
+    \ENDIF
+\ENDFOR
+\STATE Assert that $G$ is a Directed Acyclic Graph (DAG)
+\RETURN $G$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Bitset-Accelerated Ancestor Reachability}
+A fundamental insight of CivicTwin is that clearing a desilted conduit does not merely benefit that individual channel; it restores hydraulic outflow for every upstream channel that discharges through it. We define the \textbf{Cascade Saved} metric, $C_{\text{saved}}(v)$, as the total number of distinct upstream ancestor conduits whose runoff passes through conduit $v$:
+\begin{equation}
+C_{\text{saved}}(v) = |\text{anc}(v)| = |\{u \in V \mid u \rightsquigarrow v \text{ in } G\}|
+\label{eqn:cascade_saved}
+\end{equation}
+
+Computing transitive closure on a 14,000-node graph via recursive traversal is computationally expensive for interactive web applications. CivicTwin achieves instantaneous computation by executing topological sort reachability over bitsets. 
+
+Let $\tau = (\tau_1, \tau_2, \dots, \tau_n)$ denote the topological sort of $G$, such that for every directed edge $(u, v) \in E$, $u$ appears before $v$ in $\tau$. Each node $v$ maintains a bitmask vector $M(v) \in \{0, 1\}^n$, where the $k$-th bit is 1 if node $k$ is an ancestor of $v$, and 0 otherwise. Processing nodes in topological order allows the ancestor mask of $v$ to be computed via bitwise logical OR ($\lor$) over its immediate predecessors:
+\begin{equation}
+M(v) = \bigvee_{p \in \text{pred}(v)} \left(M(p) \lor (1 \ll p)\right)
+\label{eqn:bitset_or}
+\end{equation}
+
+The cardinality $|\text{anc}(v)|$ is subsequently obtained via hardware-accelerated population count (\texttt{popcount} / \texttt{bit\_count}), which counts the set bits in constant time. This reduces the asymptotic complexity to $\mathcal{O}(|V| \cdot \lceil |V| / 64 \rceil)$, executing across 13,998 nodes in under 20 milliseconds on standard CPU hardware.
+
+\section{Systemic Network Risk Exposure Metric}
+When a downstream conduit experiences hydraulic capacity exhaustion ($U > 1.0$), water cannot discharge freely. Backwater surcharge propagates upstream, submerging the outfall of connected conduits and raising their effective water levels. 
+
+To quantify this phenomenon across the municipality, CivicTwin defines the \textbf{Systemic Network Risk Exposure}, $E_{\text{net}}(i)$, as the sum over all conduits of the worst capacity utilisation encountered at or downstream of that conduit:
+\begin{equation}
+E_{\text{net}}(i) = \sum_{v \in V} \max_{u \in \text{desc}(v) \cup \{v\}} \left(U(u, i) \times 100\right)
+\label{eqn:network_risk_exposure}
+\end{equation}
+where $\text{desc}(v)$ denotes the set of all downstream descendants of $v$. 
+
+Evaluating Eqn.~\ref{eqn:network_risk_exposure} is performed efficiently using dynamic programming in reverse topological order (from drainage outfalls up toward headwaters):
+\begin{equation}
+D(v) = \max\left(U(v, i) \times 100, \max_{s \in \text{succ}(v)} D(s)\right)
+\label{eqn:downstream_dp}
+\end{equation}
+where $D(v)$ represents the worst downstream utilisation bottleneck affecting conduit $v$.
+
+Under this formulation, clearing a downstream bottleneck simultaneously reduces $D(v)$ for that conduit and for every one of its upstream ancestors. Consequently, desilting a major downstream trunk conduit yields an exposure reduction proportional to its cascade reachability $C_{\text{saved}}$, mathematically explaining why cascade-aware prioritization substantially outperforms local severity-only desilting.

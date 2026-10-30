@@ -1,0 +1,60 @@
+\chapter*{APPENDIX B: CORE MATHEMATICAL ALGORITHMS}
+\addcontentsline{toc}{chapter}{APPENDIX B: CORE MATHEMATICAL ALGORITHMS}
+
+\begin{algorithm}[h!]
+\caption{Bitset Ancestor Reachability over Topological Order}
+\label{alg:bitset_reachability}
+\begin{algorithmic}[1]
+\REQUIRE Directed Acyclic Graph $G = (V, E)$, $|V| = n$
+\ENSURE Array $C_{\text{saved}}[0 \dots n-1]$ containing count of upstream ancestors
+\STATE Compute topological sort order $\tau = (\tau_1, \tau_2, \dots, \tau_n)$ of $G$ using Kahn's algorithm or DFS
+\STATE Initialize array of bitsets $M[0 \dots n-1]$ with all bits set to 0
+\FORALL{$v \in \tau$}
+    \STATE $mask \leftarrow 0$
+    \FORALL{$p \in \text{predecessors}(v)$}
+        \STATE $mask \leftarrow mask \lor M[p] \lor (1 \ll p)$ \COMMENT{Bitwise OR operation}
+    \ENDFOR
+    \STATE $M[v] \leftarrow mask$
+    \STATE $C_{\text{saved}}[v] \leftarrow \text{popcount}(M[v])$ \COMMENT{Count number of 1-bits}
+\ENDFOR
+\RETURN $C_{\text{saved}}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+\caption{Dynamic Programming for Systemic Network Risk Exposure}
+\label{alg:network_exposure}
+\begin{algorithmic}[1]
+\REQUIRE Directed Acyclic Graph $G = (V, E)$, topological order $\tau$, capacity utilisation array $U[0 \dots n-1]$
+\ENSURE Total systemic network risk exposure $E_{\text{net}}$
+\STATE Initialize array $D[0 \dots n-1]$ where $D[v] \leftarrow U[v] \times 100$ for all $v \in V$
+\FORALL{$v$ in reverse of $\tau$} \COMMENT{Traverse from outfalls up to headwaters}
+    \FORALL{$s \in \text{successors}(v)$}
+        \IF{$D[s] > D[v]$}
+            \STATE $D[v] \leftarrow D[s]$
+        \ENDIF
+    \ENDFOR
+\ENDFOR
+\STATE $E_{\text{net}} \leftarrow \sum_{v \in V} D[v]$
+\RETURN $E_{\text{net}}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+\caption{Cascade-Aware Priority Dispatch and Queue Management}
+\label{alg:cascade_dispatch}
+\begin{algorithmic}[1]
+\REQUIRE Conduits $V$, status array $S$, rain $i$, ward filter $w$, budget $K$
+\ENSURE Top-$K$ ranked conduits for dispatch
+\STATE Compute rational runoff flow $Q[v] = C[v] \cdot i \cdot A[v] / 3.6\times 10^6$ for all $v \in V$
+\STATE Compute available capacity $Q_{\text{avail}}[v] = Q_{\text{design}}[v] \cdot \max(1 - \text{silt}[v]/100, 0.05)$
+\STATE Compute utilization $U[v] = \min(3.0, Q[v] / Q_{\text{avail}}[v])$
+\STATE Classify threat tier $T[v] \leftarrow 2$ if $U[v] > 1.25$ else ($1$ if $U[v] > 0.80$ else $0$)
+\STATE Filter candidates: $Cand \leftarrow \{v \in V \mid S[v] == \text{OPEN} \text{ and } v \text{ is rankable}\}$
+\IF{$w \text{ is not NULL}$}
+    \STATE $Cand \leftarrow \{v \in Cand \mid \text{ward}[v] == w\}$
+\ENDIF
+\STATE Sort $Cand$ lexicographically by: $(-T[v], -C_{\text{saved}}[v], -U[v], v)$
+\RETURN First $K$ elements of $Cand$
+\end{algorithmic}
+\end{algorithm}
